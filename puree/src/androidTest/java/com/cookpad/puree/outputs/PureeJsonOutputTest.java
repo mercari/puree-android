@@ -2,7 +2,7 @@ package com.cookpad.puree.outputs;
 
 import com.google.gson.JsonObject;
 
-import com.cookpad.puree.PureeFilter;
+import com.cookpad.puree.PureeJsonFilter;
 
 import org.json.JSONException;
 import org.junit.Test;
@@ -18,10 +18,10 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
-public class PureeOutputTest {
+public class PureeJsonOutputTest {
     @Test
     public void discardLog() {
-        final PureeOutput output = new PureeOutput() {
+        final PureeJsonOutput output = new PureeJsonOutput() {
             @Override
             public void emit(JsonObject jsonLog) {
                 // because first filter discards log.
@@ -40,14 +40,14 @@ public class PureeOutputTest {
                 return "output";
             }
         };
-        output.registerFilter(new PureeFilter() {
+        output.registerFilter(new PureeJsonFilter() {
             @Override
             public JsonObject apply(JsonObject jsonLog) {
                 // discard log
                 return null;
             }
         });
-        output.registerFilter(new PureeFilter() {
+        output.registerFilter(new PureeJsonFilter() {
             @Override
             public JsonObject apply(JsonObject jsonLog) {
                 jsonLog.addProperty("event_time", System.currentTimeMillis());
@@ -63,7 +63,7 @@ public class PureeOutputTest {
 
         final AtomicReference<JsonObject> result = new AtomicReference<>();
 
-        final PureeOutput output = new PureeOutput() {
+        final PureeJsonOutput output = new PureeJsonOutput() {
             @Override
             public void emit(JsonObject jsonLog) {
                 result.set(jsonLog);
@@ -81,7 +81,7 @@ public class PureeOutputTest {
                 return "output";
             }
         };
-        output.registerFilter(new PureeFilter() {
+        output.registerFilter(new PureeJsonFilter() {
             @Override
             public JsonObject apply(JsonObject jsonLog) {
                 JsonObject jsonObject = new JsonObject();
@@ -89,7 +89,7 @@ public class PureeOutputTest {
                 return jsonObject;
             }
         });
-        output.registerFilter(new PureeFilter() {
+        output.registerFilter(new PureeJsonFilter() {
             @Override
             public JsonObject apply(JsonObject jsonLog) {
                 final JsonObject jsonObject = new JsonObject();

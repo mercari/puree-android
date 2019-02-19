@@ -1,5 +1,6 @@
 package com.cookpad.puree.outputs;
 
+import com.cookpad.puree.storage.JsonRecords;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -7,20 +8,19 @@ import com.cookpad.puree.PureeLogger;
 import com.cookpad.puree.async.AsyncResult;
 import com.cookpad.puree.internal.PureeVerboseRunnable;
 import com.cookpad.puree.internal.RetryableTaskRunner;
-import com.cookpad.puree.storage.Records;
 
 import java.util.concurrent.ScheduledExecutorService;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-public abstract class PureeBufferedOutput extends PureeOutput {
+public abstract class PureeBufferedJsonOutput extends PureeJsonOutput {
 
     RetryableTaskRunner flushTask;
 
     ScheduledExecutorService executor;
 
-    public PureeBufferedOutput() {
+    public PureeBufferedJsonOutput() {
     }
 
     @Override
@@ -65,21 +65,21 @@ public abstract class PureeBufferedOutput extends PureeOutput {
             flushTask.retryLater();
             return;
         }
-        final Records records = getRecordsFromStorage();
+        final JsonRecords jsonRecords = getRecordsFromStorage();
 
-        if (records.isEmpty()) {
+        if (jsonRecords.isEmpty()) {
             storage.unlock();
             flushTask.reset();
             return;
         }
 
-        final JsonArray jsonLogs = records.getJsonLogs();
+        final JsonArray jsonLogs = jsonRecords.getJsonLogs();
 
         emit(jsonLogs, new AsyncResult() {
             @Override
             public void success() {
                 flushTask.reset();
-                storage.delete(records);
+                storage.delete(jsonRecords);
                 storage.unlock();
             }
 
@@ -91,8 +91,8 @@ public abstract class PureeBufferedOutput extends PureeOutput {
         });
     }
 
-    private Records getRecordsFromStorage() {
-        return storage.select(type(), conf.getLogsPerRequest());
+    private JsonRecords getRecordsFromStorage() {
+        return storage.selectJson(type(), conf.getLogsPerRequest());
     }
 
     public abstract void emit(JsonArray jsonArray, final AsyncResult result);

@@ -1,7 +1,9 @@
 package com.cookpad.puree;
 
 import com.cookpad.puree.internal.LogDumper;
-import com.cookpad.puree.storage.Records;
+import com.cookpad.puree.storage.BinaryRecords;
+import com.cookpad.puree.storage.JsonRecords;
+import com.google.protobuf.MessageLite;
 
 import android.util.Log;
 
@@ -28,13 +30,24 @@ public class Puree {
     /**
      * Try to send log.
      * <p>
-     * This log is sent immediately or put into buffer (it's depending on output plugin).
+     * This log is sent immediately or put into a buffer depending on the output plugin.
      *
      * @param log {@link PureeLog}.
      */
     public static void send(final PureeLog log) {
         checkIfPureeHasInitialized();
         logger.send(log);
+    }
+
+    /**
+     * Tries to send a protobuf log entry.
+     * <p>
+     * This log is sent immediately or put into a buffer depending on the output plugin.
+     * @param protoLog
+     */
+    public static void send(MessageLite protoLog) {
+        checkIfPureeHasInitialized();
+        logger.send(protoLog);
     }
 
     /**
@@ -46,18 +59,30 @@ public class Puree {
     }
 
     public static void dump() {
-        LogDumper.out(getBufferedLogs());
+        LogDumper.out(getBufferedJsonLogs());
+        LogDumper.out(getBufferedBinaryLogs());
     }
 
     /**
-     * Get all logs that in buffer.
+     * Get all JSON logs in the buffer.
      *
-     * @return {@link Records}.
+     * @return {@link JsonRecords}.
      */
-    public static Records getBufferedLogs() {
+    public static JsonRecords getBufferedJsonLogs() {
         checkIfPureeHasInitialized();
-        return logger.getBufferedLogs();
+        return logger.getBufferedJsonLogs();
     }
+
+    /**
+     * Get all binary logs in the buffer.
+     *
+     * @return {@link BinaryRecords}.
+     */
+    public static BinaryRecords getBufferedBinaryLogs() {
+        checkIfPureeHasInitialized();
+        return logger.getBufferedBinaryLogs();
+    }
+
 
     /**
      * Discards all logs in buffer.

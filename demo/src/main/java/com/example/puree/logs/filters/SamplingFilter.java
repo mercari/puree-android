@@ -2,13 +2,13 @@ package com.example.puree.logs.filters;
 
 import com.google.gson.JsonObject;
 
-import com.cookpad.puree.PureeFilter;
+import com.cookpad.puree.PureeJsonFilter;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-public class SamplingFilter implements PureeFilter {
+public class SamplingFilter implements PureeJsonFilter {
     private final float samplingRate;
 
     public SamplingFilter(float samplingRate) {

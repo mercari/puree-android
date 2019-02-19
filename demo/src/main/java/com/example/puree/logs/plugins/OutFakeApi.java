@@ -1,17 +1,17 @@
 package com.example.puree.logs.plugins;
 
+import com.cookpad.puree.outputs.PureeBufferedJsonOutput;
 import com.google.gson.JsonArray;
 
 import com.cookpad.puree.async.AsyncResult;
 import com.cookpad.puree.outputs.OutputConfiguration;
-import com.cookpad.puree.outputs.PureeBufferedOutput;
 import com.example.puree.FakeApiClient;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-public class OutFakeApi extends PureeBufferedOutput {
+public class OutFakeApi extends PureeBufferedJsonOutput {
     private static final FakeApiClient CLIENT = new FakeApiClient();
 
     @Override

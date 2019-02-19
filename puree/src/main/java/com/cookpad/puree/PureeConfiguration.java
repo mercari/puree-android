@@ -1,11 +1,13 @@
 package com.cookpad.puree;
 
+import com.cookpad.puree.outputs.PureeJsonOutput;
+import com.cookpad.puree.outputs.PureeProtobufOutput;
 import com.google.gson.Gson;
 
 import com.cookpad.puree.internal.LogDumper;
-import com.cookpad.puree.outputs.PureeOutput;
 import com.cookpad.puree.storage.PureeSQLiteStorage;
 import com.cookpad.puree.storage.PureeStorage;
+import com.google.protobuf.MessageLite;
 
 import android.content.Context;
 
@@ -26,7 +28,9 @@ public class PureeConfiguration {
 
     private final Gson gson;
 
-    private final Map<Class<?>, List<PureeOutput>> sourceOutputMap;
+    private final Map<Class<? extends PureeLog>, List<PureeJsonOutput>> sourceOutputMap;
+
+    private final Map<Class<? extends MessageLite>, List<PureeProtobufOutput>> protoSourceOutputMap;
 
     private final PureeStorage storage;
 
@@ -40,27 +44,35 @@ public class PureeConfiguration {
         return gson;
     }
 
-    public Map<Class<?>, List<PureeOutput>> getSourceOutputMap() {
+    public Map<Class<? extends PureeLog>, List<PureeJsonOutput>> getSourceOutputMap() {
         return sourceOutputMap;
+    }
+
+    public Map<Class<? extends MessageLite>, List<PureeProtobufOutput>> getProtoSourceOutputMap() {
+        return protoSourceOutputMap;
     }
 
     public PureeStorage getStorage() {
         return storage;
     }
 
-    public List<PureeOutput> getRegisteredOutputPlugins(Class<? extends PureeLog> logClass) {
+    public List<PureeJsonOutput> getRegisteredOutputPlugins(Class<? extends PureeLog> logClass) {
         return sourceOutputMap.get(logClass);
     }
 
     public PureeLogger createPureeLogger() {
-        return new PureeLogger(sourceOutputMap, gson, storage, executor);
+        return new PureeLogger(sourceOutputMap, gson, protoSourceOutputMap, storage, executor);
     }
 
-    PureeConfiguration(Context context, Gson gson, Map<Class<?>, List<PureeOutput>> sourceOutputMap, PureeStorage storage,
-            ScheduledExecutorService executor) {
+    PureeConfiguration(Context context, Gson gson,
+                       Map<Class<? extends PureeLog>, List<PureeJsonOutput>> sourceOutputMap,
+                       Map<Class<? extends MessageLite>, List<PureeProtobufOutput>> protoSourceOutputMap,
+                       PureeStorage storage,
+                       ScheduledExecutorService executor) {
         this.context = context;
         this.gson = gson;
         this.sourceOutputMap = sourceOutputMap;
+        this.protoSourceOutputMap = protoSourceOutputMap;
         this.storage = storage;
         this.executor = executor;
 
@@ -71,6 +83,7 @@ public class PureeConfiguration {
      */
     public void printMapping() {
         LogDumper.out(sourceOutputMap);
+        LogDumper.outProtoSourceMap(protoSourceOutputMap);
     }
 
     public static class Builder {
@@ -78,7 +91,9 @@ public class PureeConfiguration {
 
         private Gson gson;
 
-        private Map<Class<?>, List<PureeOutput>> sourceOutputMap = new HashMap<>();
+        private Map<Class<? extends PureeLog>, List<PureeJsonOutput>> sourceOutputMap = new HashMap<>();
+
+        private Map<Class<? extends MessageLite>, List<PureeProtobufOutput>> protoSourceOutputMap = new HashMap<>();
 
         private PureeStorage storage;
 
@@ -106,7 +121,7 @@ public class PureeConfiguration {
 
         /**
          * Specify a source class of logs, which returns {@link Source} an
-         * {@link Source#to(PureeOutput)} must be called to register an output plugin.
+         * {@link Source#to(PureeJsonOutput)} must be called to register an output plugin.
          *
          * @param logClass log class.
          * @return {@link Source}.
@@ -115,13 +130,23 @@ public class PureeConfiguration {
             return new Source(this, logClass);
         }
 
-        public Builder register(Class<?> logClass, PureeOutput output) {
-            List<PureeOutput> outputs = sourceOutputMap.get(logClass);
+        public Builder register(Class<? extends PureeLog> logClass, PureeJsonOutput output) {
+            List<PureeJsonOutput> outputs = sourceOutputMap.get(logClass);
             if (outputs == null) {
                 outputs = new ArrayList<>();
             }
             outputs.add(output);
             sourceOutputMap.put(logClass, outputs);
+            return this;
+        }
+
+        public Builder registerProtoLog(Class<? extends MessageLite> logClass, PureeProtobufOutput output) {
+            List<PureeProtobufOutput> outputs = protoSourceOutputMap.get(logClass);
+            if (outputs == null) {
+                outputs = new ArrayList<>();
+            }
+            outputs.add(output);
+            protoSourceOutputMap.put(logClass, outputs);
             return this;
         }
 
@@ -151,7 +176,8 @@ public class PureeConfiguration {
             if (executor == null) {
                 executor = newBackgroundExecutor();
             }
-            return new PureeConfiguration(context, gson, sourceOutputMap, storage, executor);
+            return new PureeConfiguration(context, gson, sourceOutputMap, protoSourceOutputMap,
+                    storage, executor);
         }
     }
 

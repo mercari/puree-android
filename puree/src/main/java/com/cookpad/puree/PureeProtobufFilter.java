@@ -1,13 +1,13 @@
 package com.cookpad.puree;
 
-import com.google.gson.JsonObject;
+import com.google.protobuf.MessageLite;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-public interface PureeFilter {
+public interface PureeProtobufFilter {
 
     @Nullable
-    JsonObject apply(JsonObject jsonLog);
+    MessageLite apply(MessageLite protoLog);
 }

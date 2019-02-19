@@ -1,9 +1,14 @@
 package com.example.puree.logs.plugins;
 
-import com.cookpad.puree.outputs.PureeJsonOutput;
-import com.google.gson.JsonObject;
+import android.os.Handler;
+import android.os.Looper;
 
+import com.cookpad.puree.async.AsyncResult;
 import com.cookpad.puree.outputs.OutputConfiguration;
+import com.cookpad.puree.outputs.PureeProtobufOutput;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.protobuf.MessageLite;
 
 import java.lang.ref.WeakReference;
 
@@ -11,12 +16,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-public class OutDisplay extends PureeJsonOutput {
+public class OutProtobufDisplay extends PureeProtobufOutput {
     public static final String TYPE = "display";
 
-    private static WeakReference<Callback> callbackRef = new WeakReference<>(null);
+    private static WeakReference<OutProtobufDisplay.Callback> callbackRef = new WeakReference<>(null);
 
-    public static void register(Callback callback) {
+    public static void register(OutProtobufDisplay.Callback callback) {
         callbackRef = new WeakReference<>(callback);
     }
 
@@ -36,16 +41,16 @@ public class OutDisplay extends PureeJsonOutput {
     }
 
     @Override
-    public void emit(JsonObject jsonLog) {
-        Callback callback = callbackRef.get();
+    public void emit(MessageLite protoLog) {
+        OutProtobufDisplay.Callback callback = callbackRef.get();
         if (callback == null) {
             return;
         }
-        callback.onEmit(jsonLog);
+        callback.onEmit(protoLog);
     }
 
     public interface Callback {
 
-        void onEmit(JsonObject jsonLog);
+        void onEmit(MessageLite protoLog);
     }
 }

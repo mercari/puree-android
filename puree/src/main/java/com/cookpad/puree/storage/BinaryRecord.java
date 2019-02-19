@@ -1,14 +1,14 @@
 package com.cookpad.puree.storage;
 
-import com.google.gson.JsonObject;
+import android.util.Base64;
 
-public class Record {
+public class BinaryRecord {
 
     private final int id;
 
     private final String type;
 
-    private final JsonObject jsonLog;
+    private final byte[] bytes;
 
     public int getId() {
         return id;
@@ -18,13 +18,11 @@ public class Record {
         return type;
     }
 
-    public JsonObject getJsonLog() {
-        return jsonLog;
-    }
+    public byte[] getBytes() { return bytes; }
 
-    public Record(int id, String type, JsonObject jsonLog) {
+    public BinaryRecord(int id, String type, byte[] bytes) {
         this.id = id;
         this.type = type;
-        this.jsonLog = jsonLog;
+        this.bytes = bytes;
     }
 }
