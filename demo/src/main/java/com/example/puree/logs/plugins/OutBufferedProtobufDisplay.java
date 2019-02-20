@@ -6,7 +6,6 @@ import android.os.Looper;
 import com.cookpad.puree.async.AsyncResult;
 import com.cookpad.puree.outputs.OutputConfiguration;
 import com.cookpad.puree.outputs.PureeBufferedProtobufOutput;
-import com.google.gson.JsonArray;
 
 import java.lang.ref.WeakReference;
 import java.util.List;

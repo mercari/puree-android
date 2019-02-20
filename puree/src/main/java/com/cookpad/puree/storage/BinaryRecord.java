@@ -1,7 +1,5 @@
 package com.cookpad.puree.storage;
 
-import android.util.Base64;
-
 public class BinaryRecord {
 
     private final int id;
