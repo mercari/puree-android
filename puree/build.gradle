@@ -4,7 +4,7 @@ apply plugin: 'com.jfrog.bintray'
 
 def GROUP_ID = 'com.mercari.puree'
 def ARTIFACT_ID = 'puree'
-def VERSION = "0.0.1"
+def VERSION = "5.0.0"
 
 project.version = VERSION
 println "building ${GROUP_ID}:${ARTIFACT_ID}:${VERSION}"
