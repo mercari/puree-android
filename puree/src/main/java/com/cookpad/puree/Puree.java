@@ -43,7 +43,7 @@ public class Puree {
      * Tries to send a protobuf log entry.
      * <p>
      * This log is sent immediately or put into a buffer depending on the output plugin.
-     * @param protoLog
+     * @param protoLog the protobuf object representing the log entry.
      */
     public static void send(MessageLite protoLog) {
         checkIfPureeHasInitialized();
