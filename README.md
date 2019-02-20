@@ -30,7 +30,7 @@ buildscript {
 
 // app/build.gradle
 dependencies {
-    compile 'com.cookpad.puree:puree:4.1.2'
+    compile 'com.mercari.puree:puree:5.0.0'
 }
 ```
 
