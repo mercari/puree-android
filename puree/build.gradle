@@ -1,6 +1,9 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
+
+group = 'com.github.mercari'
 
 def GROUP_ID = 'com.mercari.puree'
 def ARTIFACT_ID = 'puree'
