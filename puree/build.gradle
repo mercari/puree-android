@@ -91,9 +91,7 @@ dependencies {
 }
 
 task androidJar(type: Jar) {
-    from 'build/intermediates/packaged-classes/release'
-    include('classes.jar')
-    rename('classes.jar', 'puree.jar')
+    from 'build/intermediates/javac/release/compileReleaseJavaWithJavac/classes'
 }
 
 task androidSourcesJar(type: Jar) {
