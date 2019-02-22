@@ -92,6 +92,9 @@ dependencies {
 
 task androidJar(type: Jar) {
     from 'build/intermediates/javac/release/compileReleaseJavaWithJavac/classes'
+    exclude '**/BuildConfig.class'
+    exclude '**/R.class'
+    includeEmptyDirs false
 }
 
 task androidSourcesJar(type: Jar) {
