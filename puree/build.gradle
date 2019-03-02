@@ -1,6 +1,9 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
+
+group = 'com.github.mercari'
 
 def GROUP_ID = 'com.mercari.puree'
 def ARTIFACT_ID = 'puree'
@@ -88,7 +91,10 @@ dependencies {
 }
 
 task androidJar(type: Jar) {
-    from 'build/intermediates/classes/release'
+    from 'build/intermediates/javac/release/compileReleaseJavaWithJavac/classes'
+    exclude '**/BuildConfig.class'
+    exclude '**/R.class'
+    includeEmptyDirs false
 }
 
 task androidSourcesJar(type: Jar) {
