@@ -2,7 +2,7 @@ package com.example.puree.logs;
 
 import com.cookpad.puree.Puree;
 import com.cookpad.puree.PureeConfiguration;
-import com.cookpad.puree.PureeJsonFilter;
+import com.cookpad.puree.PureeFilter;
 import com.cookpad.puree.plugins.OutBufferedLogcat;
 import com.example.event.Event;
 import com.example.puree.logs.plugins.OutBufferedProtobufLogcat;
@@ -23,8 +23,8 @@ public class PureeConfigurator {
     }
 
     public static PureeConfiguration buildConf(Context context) {
-        PureeJsonFilter addEventTimeFilter = new AddEventTimeFilter();
-        PureeJsonFilter samplingFilter = new SamplingFilter(1.0f);
+        PureeFilter addEventTimeFilter = new AddEventTimeFilter();
+        PureeFilter samplingFilter = new SamplingFilter(1.0f);
         PureeConfiguration conf = new PureeConfiguration.Builder(context)
                 .executor(Executors.newScheduledThreadPool(1)) // optional
                 .register(ClickLog.class, new OutDisplay().withFilters(addEventTimeFilter))

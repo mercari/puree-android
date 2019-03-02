@@ -1,7 +1,7 @@
 package com.cookpad.puree.internal;
 
 import com.cookpad.puree.PureeLog;
-import com.cookpad.puree.outputs.PureeJsonOutput;
+import com.cookpad.puree.outputs.PureeOutput;
 import com.cookpad.puree.storage.JsonRecords;
 
 import org.junit.Test;
@@ -18,6 +18,6 @@ public class LogDumperTest {
     @Test
     public void testRunLogDumper() throws Exception {
         LogDumper.out(new JsonRecords());
-        LogDumper.out(new HashMap<Class<? extends PureeLog>, List<PureeJsonOutput>>());
+        LogDumper.out(new HashMap<Class<? extends PureeLog>, List<PureeOutput>>());
     }
 }

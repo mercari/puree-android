@@ -1,9 +1,9 @@
 package com.cookpad.puree.internal;
 
-import com.cookpad.puree.PureeJsonFilter;
+import com.cookpad.puree.PureeFilter;
 import com.cookpad.puree.PureeLog;
 import com.cookpad.puree.PureeProtobufFilter;
-import com.cookpad.puree.outputs.PureeJsonOutput;
+import com.cookpad.puree.outputs.PureeOutput;
 import com.cookpad.puree.outputs.PureeProtobufOutput;
 import com.cookpad.puree.storage.BinaryRecords;
 import com.cookpad.puree.storage.JsonRecords;
@@ -60,13 +60,13 @@ public class LogDumper {
         }
     }
 
-    public static void out(Map<Class<? extends PureeLog>, List<PureeJsonOutput>> sourceOutputMap) {
+    public static void out(Map<Class<? extends PureeLog>, List<PureeOutput>> sourceOutputMap) {
         Log.i(TAG, "# SOURCE -> FILTER... -> OUTPUT");
         for (Class<?> key : sourceOutputMap.keySet()) {
             StringBuilder builder;
-            for (PureeJsonOutput output : sourceOutputMap.get(key)) {
+            for (PureeOutput output : sourceOutputMap.get(key)) {
                 builder = new StringBuilder(key.getSimpleName());
-                for (PureeJsonFilter filter : output.getFilters()) {
+                for (PureeFilter filter : output.getFilters()) {
                     builder.append(" -> ").append(filter.getClass().getSimpleName());
                 }
                 builder.append(" -> ").append(output.getClass().getSimpleName());

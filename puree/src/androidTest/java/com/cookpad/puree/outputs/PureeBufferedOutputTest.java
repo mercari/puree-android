@@ -3,7 +3,7 @@ package com.cookpad.puree.outputs;
 import android.content.Context;
 
 import com.cookpad.puree.PureeConfiguration;
-import com.cookpad.puree.PureeJsonFilter;
+import com.cookpad.puree.PureeFilter;
 import com.cookpad.puree.PureeLog;
 import com.cookpad.puree.PureeLogger;
 import com.cookpad.puree.async.AsyncResult;
@@ -83,7 +83,7 @@ public class PureeBufferedOutputTest {
 
 
     @ParametersAreNonnullByDefault
-    static abstract class BufferedOutputBase extends PureeBufferedJsonOutput {
+    static abstract class BufferedOutputBase extends PureeBufferedOutput {
 
         @Nonnull
         @Override
@@ -184,7 +184,7 @@ public class PureeBufferedOutputTest {
 
 
     @ParametersAreNonnullByDefault
-    public static class DiscardFilter implements PureeJsonFilter {
+    public static class DiscardFilter implements PureeFilter {
 
         @Nullable
         @Override
@@ -205,7 +205,7 @@ public class PureeBufferedOutputTest {
         }
     }
 
-    void initializeLogger(PureeJsonOutput output) {
+    void initializeLogger(PureeOutput output) {
         logger = new PureeConfiguration.Builder(context)
                 .register(PvLog.class, output)
                 .build()

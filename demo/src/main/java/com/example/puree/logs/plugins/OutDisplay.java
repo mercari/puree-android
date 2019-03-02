@@ -1,6 +1,6 @@
 package com.example.puree.logs.plugins;
 
-import com.cookpad.puree.outputs.PureeJsonOutput;
+import com.cookpad.puree.outputs.PureeOutput;
 import com.google.gson.JsonObject;
 
 import com.cookpad.puree.outputs.OutputConfiguration;
@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-public class OutDisplay extends PureeJsonOutput {
+public class OutDisplay extends PureeOutput {
     public static final String TYPE = "display";
 
     private static WeakReference<Callback> callbackRef = new WeakReference<>(null);

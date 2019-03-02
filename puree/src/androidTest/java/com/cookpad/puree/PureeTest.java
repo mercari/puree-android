@@ -2,7 +2,7 @@ package com.cookpad.puree;
 
 import android.content.Context;
 
-import com.cookpad.puree.outputs.PureeJsonOutput;
+import com.cookpad.puree.outputs.PureeOutput;
 import com.cookpad.puree.storage.PureeSQLiteStorage;
 import com.google.gson.Gson;
 
@@ -23,7 +23,7 @@ public class PureeTest {
     static class DummyPureeLogger extends PureeLogger {
 
         public DummyPureeLogger(Context context) {
-            super(new HashMap<Class<? extends PureeLog>, List<PureeJsonOutput>>(),
+            super(new HashMap<Class<? extends PureeLog>, List<PureeOutput>>(),
                     new Gson(), new PureeSQLiteStorage(context),
                     Executors.newScheduledThreadPool(1));
         }

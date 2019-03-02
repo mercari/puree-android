@@ -1,10 +1,10 @@
 package com.example.puree.logs.plugins;
 
+import com.cookpad.puree.outputs.PureeBufferedOutput;
 import com.google.gson.JsonArray;
 
 import com.cookpad.puree.async.AsyncResult;
 import com.cookpad.puree.outputs.OutputConfiguration;
-import com.cookpad.puree.outputs.PureeBufferedJsonOutput;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -15,7 +15,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-public class OutBufferedDisplay extends PureeBufferedJsonOutput {
+public class OutBufferedDisplay extends PureeBufferedOutput {
     private static WeakReference<Callback> callbackRef = new WeakReference<>(null);
 
     public static void register(Callback callback) {

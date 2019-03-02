@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-public interface PureeJsonFilter {
+public interface PureeFilter {
 
     @Nullable
     JsonObject apply(JsonObject jsonLog);

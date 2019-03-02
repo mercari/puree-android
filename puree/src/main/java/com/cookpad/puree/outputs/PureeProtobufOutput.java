@@ -66,7 +66,7 @@ public abstract class PureeProtobufOutput {
     }
 
     public void flush() {
-        // do nothing because PureeJsonOutput don't have any buffers.
+        // do nothing because PureeOutput don't have any buffers.
     }
 
     @Nonnull

@@ -14,13 +14,13 @@ import java.util.concurrent.ScheduledExecutorService;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-public abstract class PureeBufferedJsonOutput extends PureeJsonOutput {
+public abstract class PureeBufferedOutput extends PureeOutput {
 
     RetryableTaskRunner flushTask;
 
     ScheduledExecutorService executor;
 
-    public PureeBufferedJsonOutput() {
+    public PureeBufferedOutput() {
     }
 
     @Override

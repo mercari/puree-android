@@ -1,6 +1,6 @@
 package com.cookpad.puree;
 
-import com.cookpad.puree.outputs.PureeJsonOutput;
+import com.cookpad.puree.outputs.PureeOutput;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +10,7 @@ public class Source {
     private PureeConfiguration.Builder builder;
 
     private Class<? extends PureeLog> logClass;
-    private List<PureeJsonFilter> filters = new ArrayList<>();
+    private List<PureeFilter> filters = new ArrayList<>();
 
     public Source(PureeConfiguration.Builder builder, Class<? extends PureeLog> logClass) {
         this.builder = builder;
@@ -18,34 +18,34 @@ public class Source {
     }
 
     /**
-     * Specify the {@link PureeJsonFilter}.
+     * Specify the {@link PureeFilter}.
      *
-     * @param filter {@link PureeJsonFilter}.
+     * @param filter {@link PureeFilter}.
      * @return {@link Source}.
      */
-    public Source filter(PureeJsonFilter filter) {
+    public Source filter(PureeFilter filter) {
         filters.add(filter);
         return this;
     }
 
     /**
-     * Specify the {@link PureeJsonFilter}.
+     * Specify the {@link PureeFilter}.
      *
-     * @param filters {@link PureeJsonFilter} list.
+     * @param filters {@link PureeFilter} list.
      * @return {@link Source}.
      */
-    public Source filters(PureeJsonFilter... filters) {
+    public Source filters(PureeFilter... filters) {
         this.filters.addAll(Arrays.asList(filters));
         return this;
     }
 
     /**
-     * Specify the {@link PureeJsonOutput} that is responded to source.
+     * Specify the {@link PureeOutput} that is responded to source.
      *
-     * @param output {@link PureeJsonOutput}.
+     * @param output {@link PureeOutput}.
      * @return {@link com.cookpad.puree.PureeConfiguration.Builder}.
      */
-    public PureeConfiguration.Builder to(PureeJsonOutput output) {
+    public PureeConfiguration.Builder to(PureeOutput output) {
         builder.register(logClass, output.withFilters(filters));
         return builder;
     }

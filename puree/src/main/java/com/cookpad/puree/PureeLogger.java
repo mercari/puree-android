@@ -1,9 +1,6 @@
 package com.cookpad.puree;
 
-import android.os.Message;
-import android.util.Log;
-
-import com.cookpad.puree.outputs.PureeJsonOutput;
+import com.cookpad.puree.outputs.PureeOutput;
 import com.cookpad.puree.outputs.PureeProtobufOutput;
 import com.cookpad.puree.storage.BinaryRecords;
 import com.google.gson.Gson;
@@ -27,7 +24,7 @@ public class PureeLogger {
 
     final Gson gson;
 
-    final Map<Class<? extends PureeLog>, List<PureeJsonOutput>> sourceOutputMap = new HashMap<>();
+    final Map<Class<? extends PureeLog>, List<PureeOutput>> sourceOutputMap = new HashMap<>();
 
     final Map<Class<? extends MessageLite>, List<PureeProtobufOutput>> protoSourceOutputMap = new HashMap<>();
 
@@ -35,7 +32,7 @@ public class PureeLogger {
 
     final ScheduledExecutorService executor;
 
-    public PureeLogger(Map<Class<? extends PureeLog>, List<PureeJsonOutput>> sourceOutputMap,
+    public PureeLogger(Map<Class<? extends PureeLog>, List<PureeOutput>> sourceOutputMap,
                        Gson gson,
                        Map<Class<? extends MessageLite>, List<PureeProtobufOutput>> protoSourceOutputMap,
                        PureeStorage storage,
@@ -46,9 +43,9 @@ public class PureeLogger {
         this.storage = storage;
         this.executor = executor;
 
-        forEachJsonOutput(new PureeLogger.Consumer<PureeJsonOutput>() {
+        forEachJsonOutput(new PureeLogger.Consumer<PureeOutput>() {
             @Override
-            public void accept(@Nonnull PureeJsonOutput value) {
+            public void accept(@Nonnull PureeOutput value) {
                 value.initialize(PureeLogger.this);
             }
         });
@@ -61,7 +58,7 @@ public class PureeLogger {
         });
     }
 
-    public PureeLogger(Map<Class<? extends PureeLog>, List<PureeJsonOutput>> sourceOutputMap,
+    public PureeLogger(Map<Class<? extends PureeLog>, List<PureeOutput>> sourceOutputMap,
                        Gson gson,
                        PureeStorage storage,
                        ScheduledExecutorService executor) {
@@ -71,8 +68,8 @@ public class PureeLogger {
     }
 
     public void send(PureeLog log) {
-        List<PureeJsonOutput> outputs = getRegisteredOutputPlugins(log);
-        for (PureeJsonOutput output : outputs) {
+        List<PureeOutput> outputs = getRegisteredOutputPlugins(log);
+        for (PureeOutput output : outputs) {
             JsonObject jsonLog = serializeLog(log);
             output.receive(jsonLog);
         }
@@ -111,9 +108,9 @@ public class PureeLogger {
     }
 
     public void flush() {
-        forEachJsonOutput(new PureeLogger.Consumer<PureeJsonOutput>() {
+        forEachJsonOutput(new PureeLogger.Consumer<PureeOutput>() {
             @Override
-            public void accept(@Nonnull PureeJsonOutput value) {
+            public void accept(@Nonnull PureeOutput value) {
                 value.flush();
             }
         });
@@ -131,7 +128,7 @@ public class PureeLogger {
     }
 
     @Nonnull
-    public List<PureeJsonOutput> getRegisteredOutputPlugins(PureeLog log) {
+    public List<PureeOutput> getRegisteredOutputPlugins(PureeLog log) {
         return getRegisteredOutputPlugins(log.getClass());
     }
 
@@ -140,8 +137,8 @@ public class PureeLogger {
     }
 
     @Nonnull
-    public List<PureeJsonOutput> getRegisteredOutputPlugins(Class<? extends PureeLog> logClass) {
-        List<PureeJsonOutput> outputs = sourceOutputMap.get(logClass);
+    public List<PureeOutput> getRegisteredOutputPlugins(Class<? extends PureeLog> logClass) {
+        List<PureeOutput> outputs = sourceOutputMap.get(logClass);
         if (outputs == null) {
             throw new NoRegisteredOutputPluginException("No output plugin registered for " + logClass);
         }
@@ -162,9 +159,9 @@ public class PureeLogger {
         void accept(@Nonnull T value);
     }
 
-    public void forEachJsonOutput(Consumer<PureeJsonOutput> f) {
-        for (List<PureeJsonOutput> outputs : new HashSet<>(sourceOutputMap.values())) {
-            for (PureeJsonOutput output : outputs) {
+    public void forEachJsonOutput(Consumer<PureeOutput> f) {
+        for (List<PureeOutput> outputs : new HashSet<>(sourceOutputMap.values())) {
+            for (PureeOutput output : outputs) {
                 f.accept(output);
             }
         }

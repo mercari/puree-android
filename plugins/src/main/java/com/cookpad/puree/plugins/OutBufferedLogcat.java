@@ -1,10 +1,10 @@
 package com.cookpad.puree.plugins;
 
+import com.cookpad.puree.outputs.PureeBufferedOutput;
 import com.google.gson.JsonArray;
 
 import com.cookpad.puree.async.AsyncResult;
 import com.cookpad.puree.outputs.OutputConfiguration;
-import com.cookpad.puree.outputs.PureeBufferedJsonOutput;
 
 import android.util.Log;
 
@@ -13,7 +13,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 
 @ParametersAreNonnullByDefault
-public class OutBufferedLogcat extends PureeBufferedJsonOutput {
+public class OutBufferedLogcat extends PureeBufferedOutput {
     public static final String TYPE = "buffered_logcat";
 
     private static final String TAG = OutBufferedLogcat.class.getSimpleName();

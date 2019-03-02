@@ -1,6 +1,6 @@
 package com.cookpad.puree;
 
-import com.cookpad.puree.outputs.PureeJsonOutput;
+import com.cookpad.puree.outputs.PureeOutput;
 import com.google.gson.JsonObject;
 
 import com.cookpad.puree.outputs.OutputConfiguration;
@@ -49,15 +49,15 @@ public class PureeConfigurationTest {
                 .build();
 
         {
-            List<PureeJsonOutput> outputs = conf.getRegisteredOutputPlugins(FooLog.class);
+            List<PureeOutput> outputs = conf.getRegisteredOutputPlugins(FooLog.class);
             assertThat(outputs, is(not(nullValue())));
             assertThat(outputs.size(), is(3));
         }
         {
-            List<PureeJsonOutput> outputs = conf.getRegisteredOutputPlugins(BarLog.class);
+            List<PureeOutput> outputs = conf.getRegisteredOutputPlugins(BarLog.class);
             assertThat(outputs.size(), is(1));
             assertThat(outputs.get(0).getClass().getName(), is(OutFoo.class.getName()));
-            List<PureeJsonFilter> filters = outputs.get(0).getFilters();
+            List<PureeFilter> filters = outputs.get(0).getFilters();
             assertThat(filters.size(), is(1));
             assertThat(filters.get(0).getClass().getName(), is(FooFilter.class.getName()));
         }
@@ -74,14 +74,14 @@ public class PureeConfigurationTest {
                 .build();
 
         {
-            List<PureeJsonOutput> outputs = conf.getRegisteredOutputPlugins(FooLog.class);
+            List<PureeOutput> outputs = conf.getRegisteredOutputPlugins(FooLog.class);
             assertThat(outputs.size(), is(3));
         }
         {
-            List<PureeJsonOutput> outputs = conf.getRegisteredOutputPlugins(BarLog.class);
+            List<PureeOutput> outputs = conf.getRegisteredOutputPlugins(BarLog.class);
             assertThat(outputs.size(), is(1));
             assertThat(outputs.get(0).getClass().getName(), is(OutFoo.class.getName()));
-            List<PureeJsonFilter> filters = outputs.get(0).getFilters();
+            List<PureeFilter> filters = outputs.get(0).getFilters();
             assertThat(filters.size(), is(1));
             assertThat(filters.get(0).getClass().getName(), is(FooFilter.class.getName()));
         }
@@ -94,14 +94,14 @@ public class PureeConfigurationTest {
     private static class BarLog implements PureeLog {
     }
 
-    private static class FooFilter implements PureeJsonFilter {
+    private static class FooFilter implements PureeFilter {
         @Override
         public JsonObject apply(JsonObject jsonLog) {
             return null;
         }
     }
 
-    private static class BarFilter implements PureeJsonFilter {
+    private static class BarFilter implements PureeFilter {
 
         @Override
         public JsonObject apply(JsonObject jsonLog) {
@@ -109,7 +109,7 @@ public class PureeConfigurationTest {
         }
     }
 
-    private static class OutFoo extends PureeJsonOutput {
+    private static class OutFoo extends PureeOutput {
 
         @Nonnull
         @Override
@@ -129,7 +129,7 @@ public class PureeConfigurationTest {
         }
     }
 
-    private static class OutBar extends PureeJsonOutput {
+    private static class OutBar extends PureeOutput {
 
         @Nonnull
         @Override
