@@ -1,9 +1,9 @@
 package com.cookpad.puree.plugins;
 
+import com.cookpad.puree.outputs.PureeOutput;
 import com.google.gson.JsonObject;
 
 import com.cookpad.puree.outputs.OutputConfiguration;
-import com.cookpad.puree.outputs.PureeOutput;
 
 import android.util.Log;
 

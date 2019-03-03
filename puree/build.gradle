@@ -1,10 +1,13 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-def GROUP_ID = 'com.cookpad.puree'
+group = 'com.github.mercari'
+
+def GROUP_ID = 'com.mercari.puree'
 def ARTIFACT_ID = 'puree'
-def VERSION = "4.1.2"
+def VERSION = "5.0.0"
 
 project.version = VERSION
 println "building ${GROUP_ID}:${ARTIFACT_ID}:${VERSION}"
@@ -72,6 +75,7 @@ android.libraryVariants.all { variant ->
 
 dependencies {
     api Libs.gson
+    api Libs.protobuf_lite
     implementation Libs.jsr305
 
     testImplementation TestLibs.hamcrest
@@ -87,7 +91,10 @@ dependencies {
 }
 
 task androidJar(type: Jar) {
-    from 'build/intermediates/classes/release'
+    from 'build/intermediates/javac/release/compileReleaseJavaWithJavac/classes'
+    exclude '**/BuildConfig.class'
+    exclude '**/R.class'
+    includeEmptyDirs false
 }
 
 task androidSourcesJar(type: Jar) {
@@ -119,22 +126,22 @@ publishing {
                 Node root = asNode()
                 root.appendNode('name', 'puree')
                 root.appendNode('description',
-                        'Puree is a data collector for unified logging layer for Android.')
-                root.appendNode('url', 'https://github.com/cookpad/puree-android')
+                        'Puree is a data collector and unified logging layer for Android.')
+                root.appendNode('url', 'https://github.com/mercari/puree-android')
 
                 def issues = root.appendNode('issueManagement')
                 issues.appendNode('system', 'github')
-                issues.appendNode('url', 'https://github.com/coopad/puree-android/issues')
+                issues.appendNode('url', 'https://github.com/mercari/puree-android/issues')
 
                 def scm = root.appendNode('scm')
-                scm.appendNode('url', 'scm:https://github.com/cookpad/puree-android')
+                scm.appendNode('url', 'scm:https://github.com/mercari/puree-android')
                 scm.appendNode('connection', 'scm:git@github.com:puree/puree-android.git')
                 scm.appendNode('developerConnection', 'scm:git@github.com:puree/puree-android.git')
 
                 def license = root.appendNode('licenses').appendNode('license')
                 license.appendNode('name', 'MIT')
                 license.appendNode('url',
-                        'https://raw.githubusercontent.com/cookpad/puree-android/master/LICENSE.txt')
+                        'https://raw.githubusercontent.com/mercari/puree-android/master/LICENSE.txt')
                 license.appendNode('distribution', 'repo')
             }
         }
@@ -150,7 +157,7 @@ def getBintrayKeyProperty() {
 }
 
 def getBintrayDryRunProperty() {
-    return hasProperty('dryRun') ? Boolean.parseBoolean(dryRun) : true
+    return hasProperty('dryRun') ? Boolean.parseBoolean(dryRun) : false
 }
 
 bintray {
@@ -163,6 +170,7 @@ bintray {
         repo = 'maven'
         name = 'puree'
         licenses = ['MIT']
+        vcsUrl = 'https://github.com/mercari/puree-android.git'
     }
 }
 

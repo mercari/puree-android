@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package com.example.event;
+
+option java_package = "com.example.event";
+option java_outer_classname = "EventProtos";
+option java_multiple_files = true;
+
+message Event {
+    string event_time = 1;
+    int32 user_id = 2;
+    string event_type = 3;
+
+    // Other event details here
+}
+
+message EventBatch {
+    repeated Event events = 1;
+    string time = 2;
+
+    // Other batch details here
+}

@@ -1,10 +1,10 @@
 package com.cookpad.puree.plugins;
 
+import com.cookpad.puree.outputs.PureeBufferedOutput;
 import com.google.gson.JsonArray;
 
 import com.cookpad.puree.async.AsyncResult;
 import com.cookpad.puree.outputs.OutputConfiguration;
-import com.cookpad.puree.outputs.PureeBufferedOutput;
 
 import android.util.Log;
 

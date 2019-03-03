@@ -16,3 +16,6 @@ secret.gradle
 build/
 captures/
 gh-pages/
+
+demo/src/main/gen
+plugins/src/main/gen

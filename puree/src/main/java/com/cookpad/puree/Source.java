@@ -9,16 +9,16 @@ import java.util.List;
 public class Source {
     private PureeConfiguration.Builder builder;
 
-    private Class<?> logClass;
+    private Class<? extends PureeLog> logClass;
     private List<PureeFilter> filters = new ArrayList<>();
 
-    public Source(PureeConfiguration.Builder builder, Class<?> logClass) {
+    public Source(PureeConfiguration.Builder builder, Class<? extends PureeLog> logClass) {
         this.builder = builder;
         this.logClass = logClass;
     }
 
     /**
-     * Specify the {@link com.cookpad.puree.PureeFilter}.
+     * Specify the {@link PureeFilter}.
      *
      * @param filter {@link PureeFilter}.
      * @return {@link Source}.
@@ -29,7 +29,7 @@ public class Source {
     }
 
     /**
-     * Specify the {@link com.cookpad.puree.PureeFilter}.
+     * Specify the {@link PureeFilter}.
      *
      * @param filters {@link PureeFilter} list.
      * @return {@link Source}.
@@ -40,9 +40,9 @@ public class Source {
     }
 
     /**
-     * Specify the {@link com.cookpad.puree.outputs.PureeOutput} that is responded to source.
+     * Specify the {@link PureeOutput} that is responded to source.
      *
-     * @param output {@link com.cookpad.puree.outputs.PureeOutput}.
+     * @param output {@link PureeOutput}.
      * @return {@link com.cookpad.puree.PureeConfiguration.Builder}.
      */
     public PureeConfiguration.Builder to(PureeOutput output) {

@@ -30,7 +30,7 @@ buildscript {
 
 // app/build.gradle
 dependencies {
-    compile 'com.cookpad.puree:puree:4.1.2'
+    compile 'com.mercari.puree:puree:5.0.0'
 }
 ```
 
@@ -54,6 +54,7 @@ public class MyApplication extends Application {
                 .executor(Executors.newScheduledThreadPool(1)) // optional
                 .register(ClickLog.class, new OutLogcat())
                 .register(ClickLog.class, new OutBufferedLogcat().withFilters(addEventTimeFilter))
+                .registerProtoLog(Event.class, new MyEventLogcat())
                 .build();
     }
 }
@@ -63,7 +64,9 @@ See also: [demo/PureeConfigurator.java](demo/src/main/java/com/example/puree/log
 
 ### Definition of PureeLog objects
 
-A log class is required to implement `PureeLog`, which is a marker interface just like as `Serializable`,
+Puree supports two types of logs - JSON logs, and protobufs.
+
+A JSON log class is required to implement `PureeLog`, which is a marker interface just like as `Serializable`,
 to serialize logs with `Gson`.
 
 ```java
@@ -80,24 +83,29 @@ public class ClickLog implements PureeLog {
 }
 ```
 
+A class generated from a protobuf can be used directly if it extends `com.google.protobuf.MessageLite` without touching the generated code. See [demo/build.gradle](demo/build.gradle) for an example of how to set up Gradle to compile protobufs with the [MessageLite](https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/MessageLite) interface, which is recommended for Android projects.
+
 You can use `Puree.send()` to send these logs to registered output plugins:
 
 ```java
 Puree.send(new ClickLog("MainActivity", "Hello"));
 // => {"page":"MainActivity","label":"Hello"}
+
+Puree.send(MyEvent.newBuilder().(/* build protobuf */).build());
+// => byte[] containing serialized bytes of protobuf object
 ```
 
 ### Definition of PureeOutput plugins
 
 There are two types of output plugins: non-buffered and buffered.
 
-- `PureeOutput`: Non-buffered output plugins write logs immediately.
-- `PureeBufferedOutput`: Buffered output plugins enqueue logs to a local storage and then flush them in background tasks.
+- `PureeJsonOutput`, `PureeProtobufOutput`: Non-buffered output plugins for logs that write logs immediately.
+- `PureeBufferedJsonOutput`, `PureeBufferedProtobufOutput`: Buffered output plugins for logs enqueue logs to a local storage and then flush them in background tasks.
 
-If you don't need buffering, you can use `PureeOutput`.
+If you don't need buffering, you can extend `PureeJsonOutput` or `PureeProtobufOutput`.
 
 ```java
-public class OutLogcat extends PureeOutput {
+public class OutLogcat extends PureeJsonOutput {
     private static final String TYPE = "out_logcat";
 
     @Override
@@ -117,10 +125,10 @@ public class OutLogcat extends PureeOutput {
 }
 ```
 
-If you need buffering, you can use `PureeBufferedOutput`.
+If you need buffering, you can extend `PureeBufferedJsonOutput` or `PureeBufferedProtobufOutput`.
 
 ```java
-public class OutFakeApi extends PureeBufferedOutput {
+public class OutFakeApi extends PureeBufferedJsonOutput {
     private static final String TYPE = "out_fake_api";
 
     private static final FakeApiClient CLIENT = new FakeApiClient();
@@ -161,12 +169,14 @@ public class OutFakeApi extends PureeBufferedOutput {
 }
 ```
 
+Puree stores protobuf log entries interally as byte arrays containing the serialized protobuf. Since the internal storage is agnostic to the protobuf message class itself, if you want to repopulate the protobuf message class, you need to do so in an output plugin. See [demo/OutBufferedProtobufLogcat.java](demo/src/main/java/com/example/puree/logs/plugins/OutBufferedProtobufLogcat.java) for an example.
+
 ### Definition of Filters
 
-If you need to add common params to each logs, you can use `PureeFilter`:
+If you need to add common params to each logs, you can use `PureeJsonFilter` or `PureeProtobufFilter`:
 
 ```java
-public class AddEventTimeFilter implements PureeFilter {
+public class AddEventTimeFilter implements PureeJsonFilter {
     public JsonObject apply(JsonObject jsonLog) {
         jsonLog.addProperty("event_time", System.currentTimeMillis());
         return jsonLog;
@@ -174,10 +184,10 @@ public class AddEventTimeFilter implements PureeFilter {
 }
 ```
 
-You can make `PureeFilter#apply()` to return `null` to skip sending logs:
+You can make `PureeJsonFilter#apply()` to return `null` to skip sending logs:
 
 ```java
-public class SamplingFilter implements PureeFilter {
+public class SamplingFilter implements PureeJsonFilter {
     private final float samplingRate;
 
     public SamplingFilter(float samplingRate) {

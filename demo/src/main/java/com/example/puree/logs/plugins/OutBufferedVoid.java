@@ -1,10 +1,10 @@
 package com.example.puree.logs.plugins;
 
+import com.cookpad.puree.outputs.PureeBufferedOutput;
 import com.google.gson.JsonArray;
 
 import com.cookpad.puree.async.AsyncResult;
 import com.cookpad.puree.outputs.OutputConfiguration;
-import com.cookpad.puree.outputs.PureeBufferedOutput;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;

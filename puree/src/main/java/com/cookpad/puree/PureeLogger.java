@@ -1,11 +1,14 @@
 package com.cookpad.puree;
 
+import com.cookpad.puree.outputs.PureeOutput;
+import com.cookpad.puree.outputs.PureeProtobufOutput;
+import com.cookpad.puree.storage.BinaryRecords;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import com.cookpad.puree.outputs.PureeOutput;
 import com.cookpad.puree.storage.PureeStorage;
-import com.cookpad.puree.storage.Records;
+import com.cookpad.puree.storage.JsonRecords;
+import com.google.protobuf.MessageLite;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,25 +24,47 @@ public class PureeLogger {
 
     final Gson gson;
 
-    final Map<Class<?>, List<PureeOutput>> sourceOutputMap = new HashMap<>();
+    final Map<Class<? extends PureeLog>, List<PureeOutput>> sourceOutputMap = new HashMap<>();
+
+    final Map<Class<? extends MessageLite>, List<PureeProtobufOutput>> protoSourceOutputMap = new HashMap<>();
 
     final PureeStorage storage;
 
     final ScheduledExecutorService executor;
 
-    public PureeLogger(Map<Class<?>, List<PureeOutput>> sourceOutputMap, Gson gson, PureeStorage storage,
-            ScheduledExecutorService executor) {
+    public PureeLogger(Map<Class<? extends PureeLog>, List<PureeOutput>> sourceOutputMap,
+                       Gson gson,
+                       Map<Class<? extends MessageLite>, List<PureeProtobufOutput>> protoSourceOutputMap,
+                       PureeStorage storage,
+                       ScheduledExecutorService executor) {
         this.sourceOutputMap.putAll(sourceOutputMap);
         this.gson = gson;
+        this.protoSourceOutputMap.putAll(protoSourceOutputMap);
         this.storage = storage;
         this.executor = executor;
 
-        forEachOutput(new PureeLogger.Consumer<PureeOutput>() {
+        forEachJsonOutput(new PureeLogger.Consumer<PureeOutput>() {
             @Override
             public void accept(@Nonnull PureeOutput value) {
                 value.initialize(PureeLogger.this);
             }
         });
+
+        forEachProtobufOutput(new PureeLogger.Consumer<PureeProtobufOutput>() {
+            @Override
+            public void accept(@Nonnull PureeProtobufOutput value) {
+                value.initialize(PureeLogger.this);
+            }
+        });
+    }
+
+    public PureeLogger(Map<Class<? extends PureeLog>, List<PureeOutput>> sourceOutputMap,
+                       Gson gson,
+                       PureeStorage storage,
+                       ScheduledExecutorService executor) {
+        this(sourceOutputMap, gson,
+                new HashMap<Class<? extends MessageLite>, List<PureeProtobufOutput>>(),
+                storage, executor);
     }
 
     public void send(PureeLog log) {
@@ -47,6 +72,14 @@ public class PureeLogger {
         for (PureeOutput output : outputs) {
             JsonObject jsonLog = serializeLog(log);
             output.receive(jsonLog);
+        }
+    }
+
+    public void send(MessageLite protoLog) {
+        List<PureeProtobufOutput> outputs = getRegisteredOutputPlugins(protoLog);
+        String protoStr = protoLog.toString();
+        for (PureeProtobufOutput output : outputs) {
+            output.receive(protoLog);
         }
     }
 
@@ -58,8 +91,12 @@ public class PureeLogger {
         return executor;
     }
 
-    public Records getBufferedLogs() {
-        return storage.selectAll();
+    public JsonRecords getBufferedJsonLogs() {
+        return storage.selectAllJsonRecords();
+    }
+
+    public BinaryRecords getBufferedBinaryLogs() {
+        return storage.selectAllBinaryRecords();
     }
 
     public void discardBufferedLogs() {
@@ -71,7 +108,7 @@ public class PureeLogger {
     }
 
     public void flush() {
-        forEachOutput(new PureeLogger.Consumer<PureeOutput>() {
+        forEachJsonOutput(new PureeLogger.Consumer<PureeOutput>() {
             @Override
             public void accept(@Nonnull PureeOutput value) {
                 value.flush();
@@ -95,9 +132,22 @@ public class PureeLogger {
         return getRegisteredOutputPlugins(log.getClass());
     }
 
+    public List<PureeProtobufOutput> getRegisteredOutputPlugins(MessageLite protoLog) {
+        return getRegisteredProtoOutputPlugins(protoLog.getClass());
+    }
+
     @Nonnull
     public List<PureeOutput> getRegisteredOutputPlugins(Class<? extends PureeLog> logClass) {
         List<PureeOutput> outputs = sourceOutputMap.get(logClass);
+        if (outputs == null) {
+            throw new NoRegisteredOutputPluginException("No output plugin registered for " + logClass);
+        }
+        return outputs;
+    }
+
+    @Nonnull
+    public List<PureeProtobufOutput> getRegisteredProtoOutputPlugins(Class<? extends MessageLite> logClass) {
+        List<PureeProtobufOutput> outputs = protoSourceOutputMap.get(logClass);
         if (outputs == null) {
             throw new NoRegisteredOutputPluginException("No output plugin registered for " + logClass);
         }
@@ -109,9 +159,17 @@ public class PureeLogger {
         void accept(@Nonnull T value);
     }
 
-    public void forEachOutput(Consumer<PureeOutput> f) {
+    public void forEachJsonOutput(Consumer<PureeOutput> f) {
         for (List<PureeOutput> outputs : new HashSet<>(sourceOutputMap.values())) {
             for (PureeOutput output : outputs) {
+                f.accept(output);
+            }
+        }
+    }
+
+    public void forEachProtobufOutput(Consumer<PureeProtobufOutput> f) {
+        for (List<PureeProtobufOutput> outputs : new HashSet<>(protoSourceOutputMap.values())) {
+            for (PureeProtobufOutput output : outputs) {
                 f.accept(output);
             }
         }

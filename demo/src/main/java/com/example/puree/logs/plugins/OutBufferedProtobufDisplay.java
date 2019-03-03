@@ -1,24 +1,21 @@
 package com.example.puree.logs.plugins;
 
-import com.cookpad.puree.outputs.PureeBufferedOutput;
-import com.google.gson.JsonArray;
-
-import com.cookpad.puree.async.AsyncResult;
-import com.cookpad.puree.outputs.OutputConfiguration;
-
 import android.os.Handler;
 import android.os.Looper;
 
+import com.cookpad.puree.async.AsyncResult;
+import com.cookpad.puree.outputs.OutputConfiguration;
+import com.cookpad.puree.outputs.PureeBufferedProtobufOutput;
+
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
 
-@ParametersAreNonnullByDefault
-public class OutBufferedDisplay extends PureeBufferedOutput {
-    private static WeakReference<Callback> callbackRef = new WeakReference<>(null);
+public class OutBufferedProtobufDisplay extends PureeBufferedProtobufOutput {
+    private static WeakReference<OutBufferedProtobufDisplay.Callback> callbackRef = new WeakReference<>(null);
 
-    public static void register(Callback callback) {
+    public static void register(OutBufferedProtobufDisplay.Callback callback) {
         callbackRef = new WeakReference<>(callback);
     }
 
@@ -39,8 +36,8 @@ public class OutBufferedDisplay extends PureeBufferedOutput {
     }
 
     @Override
-    public void emit(final JsonArray jsonLogs, final AsyncResult result) {
-        final Callback callback = callbackRef.get();
+    public void emit(final List<byte[]> binaryLogs, final AsyncResult result) {
+        final OutBufferedProtobufDisplay.Callback callback = callbackRef.get();
         if (callback == null) {
             result.success();
             return;
@@ -48,7 +45,7 @@ public class OutBufferedDisplay extends PureeBufferedOutput {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                callback.onEmit(jsonLogs);
+                callback.onEmit(binaryLogs);
                 result.success();
             }
         });
@@ -56,6 +53,6 @@ public class OutBufferedDisplay extends PureeBufferedOutput {
 
     public interface Callback {
 
-        void onEmit(JsonArray jsonLogs);
+        void onEmit(List<byte[]> binaryLogs);
     }
 }

@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/clickable_button_background"
-            android:text="BUTTON 1"
+            android:text="JSON 1"
             android:textColor="@android:color/white" />
 
         <Button
@@ -26,8 +26,22 @@
             android:layout_marginLeft="8dp"
             android:layout_weight="1"
             android:background="@drawable/clickable_button_background"
-            android:text="BUTTON 2"
+            android:text="JSON 2"
             android:textColor="@android:color/white" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/clickable_button_background"
+            android:text="Protobuf" />
     </LinearLayout>
 
     <ScrollView

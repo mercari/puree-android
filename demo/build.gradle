@@ -1,4 +1,14 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.protobuf'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.8'
+    }
+}
 
 android {
     compileSdkVersion BuildSettings.compileSdkVersion
@@ -23,6 +33,31 @@ android {
     }
 }
 
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.0.0'
+    }
+    plugins {
+        grpc {
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.0.0-pre2'
+        }
+        javalite {
+            artifact = 'com.google.protobuf:protoc-gen-javalite:3.0.0'
+        }
+    }
+    generateProtoTasks {
+        all()*.plugins {
+            javalite { }
+        }
+        ofNonTest()*.plugins {
+            grpc {
+                // Options added to --grpc_out
+                option 'lite'
+            }
+        }
+    }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':puree')
@@ -30,4 +65,11 @@ dependencies {
 
     implementation Libs.appCompatV7
     implementation Libs.jsr305
+
+    implementation Libs.protobuf_lite
+}
+
+def assertJavaCompileHasProtoGeneratedDir(Object variant, Collection<String> codegenPlugins) {
+    rootProject.assertJavaCompileHasProtoGeneratedDir(project, variant.name, variant.javaCompile,
+            codegenPlugins)
 }

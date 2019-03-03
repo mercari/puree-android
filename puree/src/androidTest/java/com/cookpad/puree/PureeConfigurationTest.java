@@ -1,9 +1,9 @@
 package com.cookpad.puree;
 
+import com.cookpad.puree.outputs.PureeOutput;
 import com.google.gson.JsonObject;
 
 import com.cookpad.puree.outputs.OutputConfiguration;
-import com.cookpad.puree.outputs.PureeOutput;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

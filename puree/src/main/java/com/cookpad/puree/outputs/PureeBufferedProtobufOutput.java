@@ -1,26 +1,24 @@
 package com.cookpad.puree.outputs;
 
-import com.cookpad.puree.storage.JsonRecords;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
 import com.cookpad.puree.PureeLogger;
 import com.cookpad.puree.async.AsyncResult;
 import com.cookpad.puree.internal.PureeVerboseRunnable;
 import com.cookpad.puree.internal.RetryableTaskRunner;
+import com.cookpad.puree.storage.BinaryRecords;
+import com.google.protobuf.MessageLite;
 
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-public abstract class PureeBufferedOutput extends PureeOutput {
-
+public abstract class PureeBufferedProtobufOutput extends PureeProtobufOutput {
     RetryableTaskRunner flushTask;
 
     ScheduledExecutorService executor;
 
-    public PureeBufferedOutput() {
+    public PureeBufferedProtobufOutput() {
     }
 
     @Override
@@ -36,11 +34,11 @@ public abstract class PureeBufferedOutput extends PureeOutput {
     }
 
     @Override
-    public void receive(final JsonObject jsonLog) {
+    public void receive(final MessageLite protoLog) {
         executor.execute(new PureeVerboseRunnable(new Runnable() {
             @Override
             public void run() {
-                JsonObject filteredLog = applyFilters(jsonLog);
+                MessageLite filteredLog = applyFilters(protoLog);
                 if (filteredLog != null) {
                     storage.insert(type(), filteredLog);
                 }
@@ -65,21 +63,21 @@ public abstract class PureeBufferedOutput extends PureeOutput {
             flushTask.retryLater();
             return;
         }
-        final JsonRecords jsonRecords = getRecordsFromStorage();
+        final BinaryRecords binaryRecords = getRecordsFromStorage();
 
-        if (jsonRecords.isEmpty()) {
+        if (binaryRecords.isEmpty()) {
             storage.unlock();
             flushTask.reset();
             return;
         }
 
-        final JsonArray jsonLogs = jsonRecords.getJsonLogs();
+        final List<byte[]> protoLogs = binaryRecords.getLogs();
 
-        emit(jsonLogs, new AsyncResult() {
+        emit(protoLogs, new AsyncResult() {
             @Override
             public void success() {
                 flushTask.reset();
-                storage.delete(jsonRecords);
+                storage.delete(binaryRecords);
                 storage.unlock();
             }
 
@@ -91,14 +89,13 @@ public abstract class PureeBufferedOutput extends PureeOutput {
         });
     }
 
-    private JsonRecords getRecordsFromStorage() {
-        return storage.selectJson(type(), conf.getLogsPerRequest());
+    private BinaryRecords getRecordsFromStorage() {
+        return storage.selectBinary(type(), conf.getLogsPerRequest());
     }
 
-    public abstract void emit(JsonArray jsonArray, final AsyncResult result);
+    public abstract void emit(List<byte[]> binaryLogs, final AsyncResult result);
 
-    public void emit(JsonObject jsonLog) {
+    public void emit(MessageLite protoLog) {
         // do nothing
     }
 }
-

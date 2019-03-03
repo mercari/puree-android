@@ -1,10 +1,9 @@
 package com.cookpad.puree.outputs;
 
-import com.cookpad.puree.PureeFilter;
-import com.google.gson.JsonObject;
-
+import com.cookpad.puree.PureeProtobufFilter;
 import com.cookpad.puree.PureeLogger;
 import com.cookpad.puree.storage.PureeStorage;
+import com.google.protobuf.MessageLite;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,27 +15,26 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-public abstract class PureeOutput {
+public abstract class PureeProtobufOutput {
     protected OutputConfiguration conf;
     protected PureeStorage storage;
-    protected List<PureeFilter> filters = new ArrayList<>();
+    protected List<PureeProtobufFilter> filters = new ArrayList<>();
 
-    public void registerFilter(PureeFilter filter) {
+    public void registerFilter(PureeProtobufFilter filter) {
         filters.add(filter);
     }
 
-    public PureeOutput withFilters(PureeFilter... filters) {
+    public PureeProtobufOutput withFilters(PureeProtobufFilter... filters) {
         Collections.addAll(this.filters, filters);
         return this;
     }
 
-    public PureeOutput withFilters(Collection<PureeFilter> filters) {
+    public PureeProtobufOutput withFilters(Collection<PureeProtobufFilter> filters) {
         this.filters.addAll(filters);
         return this;
     }
 
-
-    public List<PureeFilter> getFilters() {
+    public List<PureeProtobufFilter> getFilters() {
         return filters;
     }
 
@@ -46,8 +44,8 @@ public abstract class PureeOutput {
         this.conf = configure(defaultConfiguration);
     }
 
-    public void receive(JsonObject jsonLog) {
-        final JsonObject filteredLog = applyFilters(jsonLog);
+    public void receive(MessageLite protoLog) {
+        final MessageLite filteredLog = applyFilters(protoLog);
         if (filteredLog == null) {
             return;
         }
@@ -56,9 +54,9 @@ public abstract class PureeOutput {
     }
 
     @Nullable
-    protected JsonObject applyFilters(JsonObject jsonLog) {
-        JsonObject filteredLog = jsonLog;
-        for (PureeFilter filter : filters) {
+    protected MessageLite applyFilters(MessageLite protoLog) {
+        MessageLite filteredLog = protoLog;
+        for (PureeProtobufFilter filter : filters) {
             filteredLog = filter.apply(filteredLog);
             if (filteredLog == null) {
                 return null;
@@ -77,6 +75,6 @@ public abstract class PureeOutput {
     @Nonnull
     public abstract OutputConfiguration configure(OutputConfiguration conf);
 
-    public abstract void emit(JsonObject jsonLog);
+    public abstract void emit(MessageLite protoLog);
 }
 

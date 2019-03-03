@@ -36,14 +36,14 @@ public class ProcessNameTest {
     public void testFindProcessNameInLinuxWay() throws Exception {
         assumeTrue(runOnAndroid());
 
-        assertThat(ProcessName.findProcessNameInLinuxWay(), is("com.cookpad.android.puree.test"));
+        assertThat(ProcessName.findProcessNameInLinuxWay(), is("com.mercari.android.puree.test"));
     }
 
     @Test
     public void testFindProcessNameInAndroidWay() throws Exception {
         assumeTrue(runOnAndroid());
 
-        assertThat(ProcessName.findProcessNameInAndroidWay(context), is("com.cookpad.android.puree.test"));
+        assertThat(ProcessName.findProcessNameInAndroidWay(context), is("com.mercari.android.puree.test"));
     }
 
     @Test

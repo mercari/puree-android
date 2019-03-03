@@ -1,8 +1,7 @@
 package com.cookpad.puree.outputs;
 
-import com.google.gson.JsonObject;
-
 import com.cookpad.puree.PureeFilter;
+import com.google.gson.JsonObject;
 
 import org.json.JSONException;
 import org.junit.Test;
