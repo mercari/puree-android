@@ -104,12 +104,7 @@ project.afterEvaluate {
                     dependencyNode.appendNode('version', dep.version)
                     dependencyNode.appendNode('scope', scope)
 
-                    if (!dep.transitive) {
-                        // If this dependency is transitive, we should force exclude all its dependencies them from the POM
-                        final exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
-                        exclusionNode.appendNode('groupId', '*')
-                        exclusionNode.appendNode('artifactId', '*')
-                    } else if (!dep.properties.excludeRules.empty) {
+                    if (!dep.properties.excludeRules.empty) {
                         // Otherwise add specified exclude rules
                         final exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
                         dep.properties.excludeRules.each { ExcludeRule rule ->
