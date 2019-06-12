@@ -1,16 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'maven'
-apply plugin: 'maven-publish'
-apply plugin: 'com.jfrog.bintray'
-
-group = 'com.github.mercari'
-
-def GROUP_ID = 'com.mercari.puree'
-def ARTIFACT_ID = 'puree'
-def VERSION = "5.0.0"
-
-project.version = VERSION
-println "building ${GROUP_ID}:${ARTIFACT_ID}:${VERSION}"
 
 android {
     compileSdkVersion BuildSettings.compileSdkVersion
@@ -18,8 +6,6 @@ android {
     defaultConfig {
         minSdkVersion BuildSettings.minSdkVersion
         targetSdkVersion BuildSettings.targetSdkVersion
-        versionCode 1
-        versionName VERSION
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -47,32 +33,6 @@ android {
     }
 }
 
-android.libraryVariants.all { variant ->
-    if (variant.buildType.isDebuggable()) {
-        return; // Skip debug builds.
-    }
-    task("javadoc${variant.name.capitalize()}", type: Javadoc) {
-        description "Generates Javadoc for $variant.name."
-        source = variant.javaCompile.source
-
-        // Add all of your dependencies and android jars to the classpath
-        classpath += files(variant.javaCompile.classpath.files)
-        classpath += files(android.getBootClasspath())
-        exclude '**/BuildConfig.java'
-        exclude '**/R.java'
-
-        options.links("http://docs.oracle.com/javase/7/docs/api/")
-        options.linksOffline("http://d.android.com/reference", "${android.sdkDirectory}/docs/reference")
-        options.charSet("utf-8")
-    }
-
-    task("bundleJavadoc${variant.name.capitalize()}", type: Jar) {
-        description "Bundles Javadoc into zip for $variant.name."
-        classifier = "javadoc"
-        from tasks["javadoc${variant.name.capitalize()}"]
-    }
-}
-
 dependencies {
     api Libs.gson
     api Libs.protobuf_lite
@@ -90,48 +50,36 @@ dependencies {
     androidTestImplementation TestLibs.androidXTestJUnit
 }
 
-task androidJar(type: Jar) {
-    from 'build/intermediates/javac/release/compileReleaseJavaWithJavac/classes'
-    exclude '**/BuildConfig.class'
-    exclude '**/R.class'
-    includeEmptyDirs false
-}
+// Publishing
+
+apply plugin: 'maven-publish'
 
 task androidSourcesJar(type: Jar) {
     classifier = 'sources'
     from android.sourceSets.main.java.srcDirs
 }
 
-task androidJavadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from 'build/docs/javadoc'
-}
+// Required in order to use bundleReleaseAar task
+// See https://stackoverflow.com/a/42160584
+project.afterEvaluate {
+    publishing.publications {
+        "maven"(MavenPublication) {
+            groupId project.group
+            artifactId project.name
+            version project.version
 
-artifacts {
-    archives androidJar
-    archives androidSourcesJar
-    archives androidJavadocJar
-}
-
-publishing {
-    publications {
-        mavenAndroid(MavenPublication) {
-            groupId GROUP_ID
-            artifactId ARTIFACT_ID
-            version VERSION
-            artifact androidJar
             artifact androidSourcesJar
-            artifact androidJavadocJar
+            artifact bundleReleaseAar
+
             pom.withXml {
                 Node root = asNode()
                 root.appendNode('name', 'puree')
-                root.appendNode('description',
-                        'Puree is a data collector and unified logging layer for Android.')
-                root.appendNode('url', 'https://github.com/mercari/puree-android')
+                root.appendNode('description', Publishing.description)
+                root.appendNode('url', Publishing.url)
 
                 def issues = root.appendNode('issueManagement')
                 issues.appendNode('system', 'github')
-                issues.appendNode('url', 'https://github.com/mercari/puree-android/issues')
+                issues.appendNode('url', Publishing.issueUrl)
 
                 def scm = root.appendNode('scm')
                 scm.appendNode('url', 'scm:https://github.com/mercari/puree-android')
@@ -140,46 +88,61 @@ publishing {
 
                 def license = root.appendNode('licenses').appendNode('license')
                 license.appendNode('name', 'MIT')
-                license.appendNode('url',
-                        'https://raw.githubusercontent.com/mercari/puree-android/master/LICENSE.txt')
+                license.appendNode('url', Publishing.licenseUrl)
                 license.appendNode('distribution', 'repo')
+
+                // Add all dependencies in pom metadata
+                final dependenciesNode = root.appendNode('dependencies')
+
+                ext.addDependency = { Dependency dep, String scope ->
+                    if (dep.group == null || dep.version == null || dep.name == null || dep.name == "unspecified")
+                        return // ignore invalid dependencies
+
+                    final dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', dep.group)
+                    dependencyNode.appendNode('artifactId', dep.name)
+                    dependencyNode.appendNode('version', dep.version)
+                    dependencyNode.appendNode('scope', scope)
+
+                    if (!dep.properties.excludeRules.empty) {
+                        // Add specified exclude rules
+                        final exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
+                        dep.properties.excludeRules.each { ExcludeRule rule ->
+                            exclusionNode.appendNode('groupId', rule.group ?: '*')
+                            exclusionNode.appendNode('artifactId', rule.module ?: '*')
+                        }
+                    }
+                }
+
+                // List all "compile" dependencies (for old Gradle)
+                configurations.compile.getDependencies().each { dep -> addDependency(dep, "compile") }
+                // List all "api" dependencies (for new Gradle) as "compile" dependencies
+                configurations.api.getDependencies().each { dep -> addDependency(dep, "compile") }
+                // List all "implementation" dependencies (for new Gradle) as "runtime" dependencies
+                configurations.implementation.getDependencies().each { dep -> addDependency(dep, "runtime") }
             }
         }
     }
 }
 
-def getBintrayUserProperty() {
-    return hasProperty('bintrayUser') ? bintrayUser : ""
-}
-
-def getBintrayKeyProperty() {
-    return hasProperty('bintrayKey') ? bintrayKey : ""
-}
-
-def getBintrayDryRunProperty() {
-    return hasProperty('dryRun') ? Boolean.parseBoolean(dryRun) : false
-}
+apply plugin: 'com.jfrog.bintray'
 
 bintray {
-    user = bintrayUserProperty
-    key = bintrayKeyProperty
-    dryRun = bintrayDryRunProperty
-    publications = ['mavenAndroid']
+    user = System.getenv("BINTRAY_USER")
+    key = System.getenv("BINTRAY_API_KEY")
+
+    setPublications("maven")
+    setConfigurations("archives")
+
     publish = true
+
     pkg {
         repo = 'maven'
         name = 'puree'
-        licenses = ['MIT']
+        desc = Publishing.description
+        websiteUrl = Publishing.url
+        issueTrackerUrl = Publishing.issueUrl
         vcsUrl = 'https://github.com/mercari/puree-android.git'
+        licenses = ['MIT']
     }
 }
-
-// execute shell which publishes javadoc with version info
-task deployJavadoc(type: Exec) {
-    workingDir '../'
-    executable "./deploy_javadoc.sh"
-    args VERSION
-}
-
-// call deployJavadoc after bintrayUpload task
-bintrayUpload.finalizedBy(deployJavadoc)

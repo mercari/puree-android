@@ -6,14 +6,32 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.2'
+        classpath 'com.android.tools.build:gradle:3.4.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
 }
 
 allprojects {
     repositories {
-        jcenter()
         google()
+        jcenter()
+        // See https://bintray.com/mercari-inc/maven
+        maven { url 'https://dl.bintray.com/mercari-inc/maven' }
     }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+// Publishing cross project setup
+
+ext.version = System.getenv("BITRISE_GIT_TAG")?.replaceAll("v", "") ?:
+        System.getenv("BITRISE_GIT_BRANCH")?.replace("/", "-") ?:
+                "WIP"
+println("Version: $ext.version")
+
+allprojects {
+    group = 'com.mercari.puree'
+    version = rootProject.ext.version
 }
