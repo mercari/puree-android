@@ -105,7 +105,7 @@ project.afterEvaluate {
                     dependencyNode.appendNode('scope', scope)
 
                     if (!dep.properties.excludeRules.empty) {
-                        // Otherwise add specified exclude rules
+                        // Add specified exclude rules
                         final exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
                         dep.properties.excludeRules.each { ExcludeRule rule ->
                             exclusionNode.appendNode('groupId', rule.group ?: '*')
