@@ -4,7 +4,7 @@ import com.example.puree.logs.plugins.OutProtobufDisplay;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import com.cookpad.puree.Puree;
+import com.mercari.puree.Puree;
 import com.example.puree.logs.ClickLog;
 import com.example.puree.logs.PvLog;
 import com.example.puree.logs.plugins.OutBufferedDisplay;

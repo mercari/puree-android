@@ -2,9 +2,9 @@ package com.example.puree.logs.plugins;
 
 import android.util.Log;
 
-import com.cookpad.puree.async.AsyncResult;
-import com.cookpad.puree.outputs.OutputConfiguration;
-import com.cookpad.puree.outputs.PureeBufferedProtobufOutput;
+import com.mercari.puree.async.AsyncResult;
+import com.mercari.puree.outputs.OutputConfiguration;
+import com.mercari.puree.outputs.PureeBufferedProtobufOutput;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.example.event.Event;
 import com.example.event.EventBatch;

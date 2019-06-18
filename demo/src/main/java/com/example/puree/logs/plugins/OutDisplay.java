@@ -1,9 +1,9 @@
 package com.example.puree.logs.plugins;
 
-import com.cookpad.puree.outputs.PureeOutput;
+import com.mercari.puree.outputs.PureeOutput;
 import com.google.gson.JsonObject;
 
-import com.cookpad.puree.outputs.OutputConfiguration;
+import com.mercari.puree.outputs.OutputConfiguration;
 
 import java.lang.ref.WeakReference;
 

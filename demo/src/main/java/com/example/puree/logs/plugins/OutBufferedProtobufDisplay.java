@@ -3,9 +3,9 @@ package com.example.puree.logs.plugins;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.cookpad.puree.async.AsyncResult;
-import com.cookpad.puree.outputs.OutputConfiguration;
-import com.cookpad.puree.outputs.PureeBufferedProtobufOutput;
+import com.mercari.puree.async.AsyncResult;
+import com.mercari.puree.outputs.OutputConfiguration;
+import com.mercari.puree.outputs.PureeBufferedProtobufOutput;
 
 import java.lang.ref.WeakReference;
 import java.util.List;

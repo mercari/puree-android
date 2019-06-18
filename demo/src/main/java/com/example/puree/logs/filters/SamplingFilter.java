@@ -2,7 +2,7 @@ package com.example.puree.logs.filters;
 
 import com.google.gson.JsonObject;
 
-import com.cookpad.puree.PureeFilter;
+import com.mercari.puree.PureeFilter;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
