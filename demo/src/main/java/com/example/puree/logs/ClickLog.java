@@ -2,7 +2,7 @@ package com.example.puree.logs;
 
 import com.google.gson.annotations.SerializedName;
 
-import com.cookpad.puree.PureeLog;
+import com.mercari.puree.PureeLog;
 
 public class ClickLog implements PureeLog {
     @SerializedName("page")

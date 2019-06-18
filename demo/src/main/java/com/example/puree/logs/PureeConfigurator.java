@@ -1,12 +1,12 @@
 package com.example.puree.logs;
 
-import com.cookpad.puree.Puree;
-import com.cookpad.puree.PureeConfiguration;
-import com.cookpad.puree.PureeFilter;
-import com.cookpad.puree.plugins.OutBufferedLogcat;
+import com.mercari.puree.Puree;
+import com.mercari.puree.PureeConfiguration;
+import com.mercari.puree.PureeFilter;
+import com.mercari.puree.plugins.OutBufferedLogcat;
 import com.example.event.Event;
 import com.example.puree.logs.plugins.OutBufferedProtobufLogcat;
-import com.cookpad.puree.plugins.OutLogcat;
+import com.mercari.puree.plugins.OutLogcat;
 import com.example.puree.AddEventTimeFilter;
 import com.example.puree.logs.filters.SamplingFilter;
 import com.example.puree.logs.plugins.OutBufferedVoid;

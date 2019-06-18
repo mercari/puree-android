@@ -1,6 +1,6 @@
 package com.example.puree;
 
-import com.cookpad.puree.Puree;
+import com.mercari.puree.Puree;
 import com.example.puree.logs.BenchmarkLog;
 
 import android.os.AsyncTask;
