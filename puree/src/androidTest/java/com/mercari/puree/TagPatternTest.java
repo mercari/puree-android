@@ -46,8 +46,11 @@ public class TagPatternTest {
 
     @Test
     public void testInvalidPatterns() {
+        assertNull(TagPattern.fromString(". . "));
         assertNull(TagPattern.fromString("a..b.c"));
         assertNull(TagPattern.fromString(""));
+        assertNull(TagPattern.fromString("."));
+        assertNull(TagPattern.fromString(".."));
         assertNull(TagPattern.fromString("a. .c"));
         assertNull(TagPattern.fromString("a.\n.c"));
         assertNull(TagPattern.fromString("a.b.c\n"));

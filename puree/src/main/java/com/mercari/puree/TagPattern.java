@@ -2,20 +2,17 @@ package com.mercari.puree;
 
 import java.util.regex.Pattern;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class TagPattern {
+public final class TagPattern {
 
     private static final String SEPARATOR = "\\.";
     private static final String ALL_WILD_CARD = "**";
     private static final String WILD_CARD = "*";
     private static final Pattern VALID_PATTERN_ALPHANUMERIC = Pattern.compile("^[A-Za-z0-9]+");
 
-    private String pattern;
-
-    public TagPattern() {
-        this.pattern = ALL_WILD_CARD;
-    }
+    private final String pattern;
 
     private TagPattern(String pattern) {
         this.pattern = pattern;
@@ -30,6 +27,9 @@ public class TagPattern {
      */
     private static boolean isValidPattern(String pattern) {
         String[] patternElements = pattern.split(SEPARATOR);
+        if (patternElements.length == 0) {
+            return false;
+        }
         for (String patternPath : patternElements) {
             if (!VALID_PATTERN_ALPHANUMERIC.matcher(patternPath).matches() &&
                     !patternPath.equals(ALL_WILD_CARD) &&
@@ -46,7 +46,7 @@ public class TagPattern {
      * @param tag
      * @return whether tag matches pattern scheme
      */
-    boolean match(String tag) {
+    public boolean match(String tag) {
         if (tag.equals(pattern)) {
             return true;
         }
@@ -87,10 +87,37 @@ public class TagPattern {
      * @return A TagPattern that fits the expected structure, null otherwise
      */
     @Nullable
-    static TagPattern fromString(String pattern) {
-        if (!isValidPattern(pattern)) {
+    public static TagPattern fromString(String pattern) {
+        if (pattern == null || !isValidPattern(pattern)) {
             return null;
         }
         return new TagPattern(pattern);
+    }
+
+    @Nonnull
+    public static TagPattern getDefaultInstance() {
+        return new TagPattern(ALL_WILD_CARD);
+    }
+
+    public String getPattern() {
+        return pattern;
+    }
+
+    @Override
+    public int hashCode() {
+        return pattern.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof TagPattern)) return false;
+        final TagPattern tagPattern = (TagPattern) obj;
+        return this.pattern.equals(tagPattern.pattern);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("TagPattern(%s)", pattern);
     }
 }
