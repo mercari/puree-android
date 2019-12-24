@@ -26,6 +26,9 @@ public final class TagPattern {
      * @return whether pattern is valid
      */
     private static boolean isValidPattern(String pattern) {
+        if (pattern == null) {
+            return false;
+        }
         String[] patternElements = pattern.split(SEPARATOR);
         if (patternElements.length == 0) {
             return false;
