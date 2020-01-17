@@ -4,6 +4,7 @@ import com.mercari.puree.PureeFilter;
 import com.google.gson.JsonObject;
 
 import com.mercari.puree.PureeLogger;
+import com.mercari.puree.TagPattern;
 import com.mercari.puree.storage.PureeStorage;
 
 import java.util.ArrayList;
@@ -53,6 +54,11 @@ public abstract class PureeOutput {
         }
 
         emit(filteredLog);
+    }
+
+    @Nonnull
+    public TagPattern getTagPattern() {
+        return TagPattern.getDefaultInstance();
     }
 
     @Nullable

@@ -2,14 +2,18 @@ package com.mercari.puree.outputs;
 
 import android.content.Context;
 
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.mercari.puree.PureeConfiguration;
 import com.mercari.puree.PureeFilter;
 import com.mercari.puree.PureeLog;
 import com.mercari.puree.PureeLogger;
+import com.mercari.puree.TagPattern;
 import com.mercari.puree.async.AsyncResult;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import junit.framework.AssertionFailedError;
 
@@ -26,9 +30,6 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-
-import androidx.test.core.app.ApplicationProvider;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -116,6 +117,33 @@ public class PureeBufferedOutputTest {
         public void flush() {
             flushCount++;
             super.flush();
+        }
+    }
+
+    @ParametersAreNonnullByDefault
+    class BufferedOutputTag extends BufferedOutputBase {
+
+        int flushCount = 0;
+
+        @Override
+        public void emit(JsonArray jsonArray, AsyncResult result) {
+            for (JsonElement item : jsonArray) {
+                logs.add(item.toString());
+            }
+            result.success();
+        }
+
+        @Override
+        public void flush() {
+            flushCount++;
+            super.flush();
+        }
+
+        @Nonnull
+        @Override
+        public TagPattern getTagPattern() {
+            TagPattern tag = TagPattern.fromString("tag.*");
+            return tag != null ? tag : TagPattern.getDefaultInstance();
         }
     }
 
@@ -229,6 +257,22 @@ public class PureeBufferedOutputTest {
         assertThat(logs.poll(100, TimeUnit.MILLISECONDS), is("{\"name\":\"baz\"}"));
         assertThat(logs.poll(100, TimeUnit.MILLISECONDS), is(nullValue()));
     }
+
+    @Test
+    public void testPureeOutputWithTag() throws Exception {
+        initializeLogger(new BufferedOutputTag());
+
+        logger.send(new PvLog("foo"), "tag.");
+        logger.send(new PvLog("bar"), "tag.pattern");
+        logger.send(new PvLog("baz"), "tag");
+        logger.flush();
+
+        Thread.sleep(100);
+
+        assertThat(logs.poll(100, TimeUnit.MILLISECONDS), is("{\"name\":\"bar\"}"));
+        assertThat(logs.poll(100, TimeUnit.MILLISECONDS), is(nullValue()));
+    }
+
 
     @Test
     public void testPureeBufferedOutputWithDiscardFilter() throws Exception {

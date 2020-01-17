@@ -2,6 +2,7 @@ package com.mercari.puree.outputs;
 
 import com.mercari.puree.PureeProtobufFilter;
 import com.mercari.puree.PureeLogger;
+import com.mercari.puree.TagPattern;
 import com.mercari.puree.storage.PureeStorage;
 import com.google.protobuf.MessageLite;
 
@@ -67,6 +68,11 @@ public abstract class PureeProtobufOutput {
 
     public void flush() {
         // do nothing because PureeOutput don't have any buffers.
+    }
+
+    @Nonnull
+    public TagPattern getTagPattern() {
+        return TagPattern.getDefaultInstance();
     }
 
     @Nonnull

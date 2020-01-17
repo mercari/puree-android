@@ -40,6 +40,19 @@ public class Puree {
     }
 
     /**
+     * Try to send log with a tag
+     * <p>
+     * This log is sent immediately or put into a buffer depending on the output plugin.
+     *
+     * @param log {@link PureeLog}.
+     * @param tag Tag to match with TagPattern {@link TagPattern}.
+     */
+    public static void send(final PureeLog log, String tag) {
+        checkIfPureeHasInitialized();
+        logger.send(log);
+    }
+
+    /**
      * Tries to send a protobuf log entry.
      * <p>
      * This log is sent immediately or put into a buffer depending on the output plugin.
@@ -48,6 +61,18 @@ public class Puree {
     public static void send(MessageLite protoLog) {
         checkIfPureeHasInitialized();
         logger.send(protoLog);
+    }
+
+    /**
+     * Tries to send a protobuf log entry with a tag
+     * <p>
+     * This log is sent immediately or put into a buffer depending on the output plugin.
+     * @param protoLog the protobuf object representing the log entry.
+     * @param tag Tag to match with TagPattern {@link TagPattern}.
+     */
+    public static void send(MessageLite protoLog, String tag) {
+        checkIfPureeHasInitialized();
+        logger.send(protoLog, tag);
     }
 
     /**

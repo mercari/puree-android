@@ -27,8 +27,10 @@ public class TagPatternTest {
         assertTrue(TagPattern.fromString("a.**").match("a.b.c"));
         assertTrue(TagPattern.fromString("a.*.*.c").match("a.b.d.c"));
         assertTrue(TagPattern.fromString("a.**.g").match("a.b.c.d.e.f.g"));
+        assertTrue(TagPattern.fromString("a.").match("a"));
         assertTrue(TagPattern.fromString("**").match(""));
         assertTrue(TagPattern.fromString("**").match("``!!``"));
+        assertTrue(TagPattern.fromString("tag.**").match("tag"));
     }
 
     @Test
@@ -37,6 +39,8 @@ public class TagPatternTest {
         assertFalse(TagPattern.fromString("*").match("aaa.bbb"));
         assertFalse(TagPattern.fromString("aaa.*").match("aaa.bbb.ccc"));
         assertFalse(TagPattern.fromString("aaa.*.ccc").match("aaa.bbb.ddd"));
+        assertFalse(TagPattern.fromString("aaa.ccc").match("aaa"));
+        assertFalse(TagPattern.fromString("aaa").match("aaa.ccc"));
         assertFalse(TagPattern.fromString("a.**").match("b.c"));
         assertFalse(TagPattern.fromString("a.**.e").match("a.b.c.d"));
         assertFalse(TagPattern.fromString("a.*.*.c").match("a.b.c"));
