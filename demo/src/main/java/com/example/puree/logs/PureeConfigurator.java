@@ -1,5 +1,6 @@
 package com.example.puree.logs;
 
+import com.example.puree.logs.plugins.OutBufferedProtobufTag;
 import com.mercari.puree.Puree;
 import com.mercari.puree.PureeConfiguration;
 import com.mercari.puree.PureeFilter;
@@ -34,6 +35,7 @@ public class PureeConfigurator {
                 .register(BenchmarkLog.class, new OutBufferedVoid().withFilters(addEventTimeFilter))
                 .registerProtoLog(Event.class, new OutProtobufDisplay())
                 .registerProtoLog(Event.class, new OutBufferedProtobufLogcat())
+                .registerProtoLog(Event.class, new OutBufferedProtobufTag())
                 .build();
         conf.printMapping();
         return conf;

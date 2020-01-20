@@ -9,5 +9,11 @@
     <string name="action_benchmark">BENCHMARK</string>
     <string name="title_activity_benchmark">Benchmark</string>
     <string name="label_benchmark">Send 100 logs with PureeBufferedOutput</string>
+    <string name="tag_hint">Enter a tag</string>
+    <string name="hint_tag">Tag</string>
+    <string name="hint_tag_pattern">Tag Pattern</string>
+    <string name="invalid_tag_pattern">Please input a valid tag pattern</string>
+    <string name="default_tag_pattern">tag.*</string>
+    <string name="default_tag">tag</string>
 
 </resources>

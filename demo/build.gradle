@@ -67,6 +67,7 @@ dependencies {
     implementation Libs.jsr305
 
     implementation Libs.protobuf_lite
+    implementation Libs.design
 }
 
 def assertJavaCompileHasProtoGeneratedDir(Object variant, Collection<String> codegenPlugins) {

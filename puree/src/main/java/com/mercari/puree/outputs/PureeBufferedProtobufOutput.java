@@ -58,6 +58,10 @@ public abstract class PureeBufferedProtobufOutput extends PureeProtobufOutput {
         }));
     }
 
+    public void cancel() {
+        flushTask.cancel();
+    }
+
     public void flushSync() {
         if (!storage.lock()) {
             flushTask.retryLater();

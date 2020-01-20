@@ -1,5 +1,6 @@
 package com.example.puree;
 
+import com.example.puree.logs.plugins.OutBufferedProtobufTag;
 import com.example.puree.logs.plugins.OutProtobufDisplay;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -14,17 +15,24 @@ import com.google.protobuf.MessageLite;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
     private TextView logDisplayTextView;
+    private EditText tagPatternInput;
+    private TextInputLayout tagPatternInputLayout;
+    private EditText tagInput;
     private Button button1;
     private Button button2;
     private Button button3;
@@ -40,6 +48,14 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onEmit(MessageLite protoLog) {
             prependOutput(protoLog.toString());
+        }
+    };
+
+
+    private final OutBufferedProtobufTag.Callback outProtobufTaggedCallback = new OutBufferedProtobufTag.Callback() {
+        @Override
+        public void onEmit(MessageLite protoLog) {
+            prependOutput("Tag: " + tagInput.getText().toString() + " " + protoLog.toString());
         }
     };
 
@@ -70,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
         findViews();
         OutDisplay.register(outDisplayCallback);
         OutProtobufDisplay.register(outProtobufDisplayCallback);
+        OutBufferedProtobufTag.register(outProtobufTaggedCallback);
         OutBufferedDisplay.register(outBufferedDisplayCallback);
         Puree.send(new PvLog(this));
         setupViews();
@@ -83,6 +100,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void findViews() {
+        tagInput = (EditText) findViewById(R.id.input_tag);
+        tagPatternInput = (EditText) findViewById(R.id.input_tag_pattern);
+        tagPatternInputLayout = (TextInputLayout) findViewById(R.id.tag_pattern_layout);
         logDisplayTextView = (TextView) findViewById(R.id.log_display);
         button1 = (Button) findViewById(R.id.button1);
         button2 = (Button) findViewById(R.id.button2);
@@ -109,7 +129,29 @@ public class MainActivity extends AppCompatActivity {
                         .setEventTime(Calendar.getInstance().getTime().toString())
                         .setUserId(123456)
                         .setEventType("click").build();
-                Puree.send(clickEvent);
+                Puree.send(clickEvent, tagInput.getText().toString());
+            }
+        });
+        tagPatternInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // stub
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // stub
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!OutBufferedProtobufTag.setTag(s.toString())) {
+                    tagPatternInputLayout.setError(getString(R.string.invalid_tag_pattern));
+                    button3.setEnabled(false);
+                } else {
+                    tagPatternInputLayout.setError(null);
+                    button3.setEnabled(true);
+                }
             }
         });
     }

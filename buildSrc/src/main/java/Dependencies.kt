@@ -5,6 +5,7 @@ object Libs {
     const val gson = "com.google.code.gson:gson:2.8.2"
     const val jsr305 = "com.google.code.findbugs:jsr305:3.0.2"
     const val protobuf_lite = "com.google.protobuf:protobuf-lite:3.0.0"
+    const val design = "com.android.support:design:28.0.0"
 }
 
 @Suppress("unused")

@@ -29,6 +29,14 @@ public class RetryableTaskRunner {
         startDelayed();
     }
 
+    public synchronized void cancel() {
+        if (future != null) {
+            future.cancel(true);
+            future = null;
+        }
+        backoffCounter.resetRetryCount();
+    }
+
     private void startDelayed() {
         if (future != null) {
             future.cancel(false);
