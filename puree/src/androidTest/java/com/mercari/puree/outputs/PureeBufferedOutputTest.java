@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
@@ -142,8 +143,7 @@ public class PureeBufferedOutputTest {
         @Nonnull
         @Override
         public TagPattern getTagPattern() {
-            TagPattern tag = TagPattern.fromString("tag.*");
-            return tag != null ? tag : TagPattern.getDefaultInstance();
+            return Objects.requireNonNull(TagPattern.fromString("tag.*"));
         }
     }
 
