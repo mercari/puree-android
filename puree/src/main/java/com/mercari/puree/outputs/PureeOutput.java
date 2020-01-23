@@ -56,6 +56,11 @@ public abstract class PureeOutput {
         emit(filteredLog);
     }
 
+    /**
+     * Override this method in order to provide your own TagPattern.
+     * Please use {@link com.mercari.puree.TagPattern#fromString(String)} to generate
+     * a proper tag pattern.
+     */
     @Nonnull
     public TagPattern getTagPattern() {
         return TagPattern.getDefaultInstance();
