@@ -22,6 +22,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public class PureeLogger {
 
+    private static final String EMPTY_TAG = "";
+
     final Gson gson;
 
     final Map<Class<? extends PureeLog>, List<PureeOutput>> sourceOutputMap = new HashMap<>();
@@ -68,18 +70,29 @@ public class PureeLogger {
     }
 
     public void send(PureeLog log) {
+        send(log, EMPTY_TAG);
+    }
+
+    public void send(PureeLog log, String tag) {
         List<PureeOutput> outputs = getRegisteredOutputPlugins(log);
         for (PureeOutput output : outputs) {
-            JsonObject jsonLog = serializeLog(log);
-            output.receive(jsonLog);
+            if (output.getTagPattern().match(tag)) {
+                JsonObject jsonLog = serializeLog(log);
+                output.receive(jsonLog);
+            }
         }
     }
 
     public void send(MessageLite protoLog) {
+        send(protoLog, EMPTY_TAG);
+    }
+
+    public void send(MessageLite protoLog, String tag) {
         List<PureeProtobufOutput> outputs = getRegisteredOutputPlugins(protoLog);
-        String protoStr = protoLog.toString();
         for (PureeProtobufOutput output : outputs) {
-            output.receive(protoLog);
+            if (output.getTagPattern().match(tag)) {
+                output.receive(protoLog);
+            }
         }
     }
 
